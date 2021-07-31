@@ -1,3 +1,4 @@
+#! /usr/bin/env php
 <?php
 class Server
 {
@@ -293,7 +294,7 @@ EOT;
 			if ($fp) {
 				fclose($fp);
 			}    
-			//chown($logfile, $conf['g_localuser']);
+			//chown($logfile, 'who?');
 			//chgrp($logfile, 777);
 		}
 		if ($msg) $msg = sprintf("%s,%s %s %s", $this->log_level, date("H:i:s"), $this->pid, $msg);
