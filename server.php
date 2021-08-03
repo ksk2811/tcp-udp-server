@@ -61,15 +61,14 @@ EOT;
 			}
 
 			if (function_exists('posix_kill')) {
-			    posix_kill($pid, 9);
-			    unlink($this->pid_file);
-			    exit(0);
+				posix_kill($old_pid, 9);
 			} else {
 				system("kill -9 $old_pid");
 			}
+
 			unlink($this->pid_file);
 			$this->log("server($old_pid): close");
-			die("server($old_pid) fisnish\n");
+			die("server($old_pid): close\n");
 		}
 
 		if (isset($options['n'])) { //no daemon
@@ -265,7 +264,7 @@ EOT;
 				if (is_callable($this->command_callback)) {
 					call_user_func($this->command_callback, $client_sock);
 				} else {
-					$buf = socket_read($client_sock, 2048);
+					$buf = socket_read($client_sock, 4096);
 					$this->log("server: data($buf)");
 				}
 				socket_close($client_sock);
@@ -303,8 +302,9 @@ EOT;
 
 }
 
-//$server = New Server();
+$server = New Server();
 
+/*
 $server = New Server(function ($sock) {
 	$file_path = "/tmp/sum.csv";
 	if(socket_recv ($sock, $buf, 1024, MSG_WAITALL) !== FALSE) {
@@ -315,5 +315,6 @@ $server = New Server(function ($sock) {
 		file_put_contents($file_path, sprintf("errorcode: %s errormsg:%s\n", $errorcode, $errormsg), FILE_APPEND);
 	}
 });
+*/
 $server->run();
 ?>
