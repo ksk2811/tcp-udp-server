@@ -203,6 +203,9 @@ EOT;
 		}
 
 		$self = $this;
+
+		/*
+		child process 종료 status 에 따른 별도의 처리가 필요할때
 		pcntl_signal(SIGCHLD, function () use ($self) {
 			while(($pid = pcntl_waitpid(-1, $status, WNOHANG)) && ($pid > 0)) {
 				$self->current_sock_cnt--;
@@ -210,6 +213,8 @@ EOT;
 				$self->log("server: connected count($this->current_sock_cnt)");
 			}
 		});
+		*/
+		pcntl_signal(SIGCHLD, SIG_IGN);
 
 		$ok = false;
 		do {
@@ -231,7 +236,8 @@ EOT;
 		printf("server start pid($this->pid) pid_path($this->pid_file) log_path($this->log_path) port($this->port)\n");
 
 		while (true) {
-			pcntl_signal_dispatch(); //c와 다르게 어떻게 하든 시그널핸들러가 틱단위로 실행되기 때문에 그냥 이렇게 처리..
+			//pcntl_signal_dispatch(); //c와 다르게 어떻게 하든 시그널핸들러가 틱단위로 실행되기 때문에 그냥 이렇게 처리..
+
 			if ($this->current_sock_cnt > $max_clients) {
 				$this->log("server: too many client count({$this->current_sock_cnt})");
 				usleep(500000); //0.5 second sigpause(0);대체할게 없어보인다.
@@ -306,7 +312,7 @@ $server = New Server();
 
 /*
 $server = New Server(function ($sock) {
-	$file_path = "/tmp/sum.csv";
+	$file_path = "/tmp/tmp_log";
 	if(socket_recv ($sock, $buf, 1024, MSG_WAITALL) !== FALSE) {
 		file_put_contents($file_path, $buf."\n", FILE_APPEND);
 	} else {
